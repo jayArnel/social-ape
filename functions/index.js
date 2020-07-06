@@ -130,4 +130,41 @@ app.post("/signup", (req, res) => {
     });
 });
 
+// Login
+app.post("/login", (req, res) => {
+  const user = {
+    email: req.body.email,
+    password: req.body.password,
+  };
+
+  let errors = {};
+  if (isEmpty(user.email)) errors.email = "Must not be empty.";
+  if (isEmpty(user.password)) errors.password = "Must not be empty.";
+
+  if (Object.keys(errors).length > 0) return res.status(400).json(errors);
+
+  firebase
+    .auth()
+    .signInWithEmailAndPassword(user.email, user.password)
+    .then((data) => {
+      return data.user.getIdToken();
+    })
+    .then((token) => {
+      return res.json({ token: token });
+    })
+    .catch((err) => {
+      console.log(err);
+      if (
+        err.code === "auth/wrong-password" ||
+        err.code === "auth/invalid-email" ||
+        err.code === "auth/user-not-found"
+      ) {
+        return res
+          .status(403)
+          .json({ general: "Wrong credentials, please try again." });
+      }
+      return res.status(500).json({ error: err.code });
+    });
+});
+
 exports.api = functions.region("asia-east2").https.onRequest(app);
