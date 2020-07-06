@@ -54,14 +54,38 @@ app.post("/scream", (req, res) => {
     });
 });
 
-// Sign up
+const isEmpty = (string) => {
+  return string.trim() === "";
+};
+
+const isEmail = (email) => {
+  const emailRegEx = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return email.match(emailRegEx);
+};
+
 app.post("/signup", (req, res) => {
+  // Sign up
   const newUser = {
     email: req.body.email,
     password: req.body.password,
     confirmPassword: req.body.confirmPassword,
     handle: req.body.handle,
   };
+
+  let errors = {};
+  if (isEmpty(newUser.email)) {
+    errors.email = "Must not be empty.";
+  } else if (!isEmail(newUser.email)) {
+    errors.email = "Must be a valid email address.";
+  }
+
+  if (isEmpty(newUser.password)) errors.password = "Must not be empty.";
+  if (newUser.password !== newUser.confirmPassword)
+    errors.confirmPassword = "Passwords must match";
+
+  if (isEmpty(newUser.handle)) errors.handle = "Must not be empty.";
+
+  if (Object.keys(errors).length > 0) return res.status(400).json(errors);
 
   let token, userId;
   db.doc(`/users/${newUser.handle}`)
