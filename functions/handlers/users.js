@@ -28,8 +28,8 @@ exports.signup = (req, res) => {
   let token, userId;
   db.doc(`/users/${newUser.handle}`)
     .get()
-    .then((doc) => {
-      if (doc.exists) {
+    .then((user) => {
+      if (user.exists) {
         return res
           .status(400)
           .json({ handle: "This handle is already taken." });
@@ -39,9 +39,9 @@ exports.signup = (req, res) => {
           .createUserWithEmailAndPassword(newUser.email, newUser.password);
       }
     })
-    .then((data) => {
-      userId = data.user.uid;
-      return data.user.getIdToken();
+    .then((userData) => {
+      userId = userData.user.uid;
+      return userData.user.getIdToken();
     })
     .then((idToken) => {
       token = idToken;
@@ -81,8 +81,8 @@ exports.login = (req, res) => {
   firebase
     .auth()
     .signInWithEmailAndPassword(user.email, user.password)
-    .then((data) => {
-      return data.user.getIdToken();
+    .then((userData) => {
+      return userData.user.getIdToken();
     })
     .then((token) => {
       return res.json({ token: token });
@@ -124,9 +124,9 @@ exports.getUserDetails = (req, res) => {
   let userData = {};
   db.doc(`/users/${req.params.handle}`)
     .get()
-    .then((doc) => {
-      if (doc.exists) {
-        userData.user = doc.data();
+    .then((user) => {
+      if (user.exists) {
+        userData.user = user.data();
         return db
           .collection("screams")
           .where("userHandle", "==", req.params.handle)
@@ -136,17 +136,17 @@ exports.getUserDetails = (req, res) => {
         return res.status(404).json({ errror: "User not found" });
       }
     })
-    .then((data) => {
+    .then((screams) => {
       userData.screams = [];
-      data.forEach((doc) => {
+      screams.forEach((scream) => {
         userData.screams.push({
-          body: doc.data().body,
-          createdAt: doc.data().createdAt,
-          userHandle: doc.data().userHandle,
-          userImage: doc.data().userImage,
-          likeCount: doc.data().likeCount,
-          commentCount: doc.data().commentCount,
-          screamId: doc.id,
+          body: scream.data().body,
+          createdAt: scream.data().createdAt,
+          userHandle: scream.data().userHandle,
+          userImage: scream.data().userImage,
+          likeCount: scream.data().likeCount,
+          commentCount: scream.data().commentCount,
+          screamId: scream.id,
         });
       });
       return res.json(userData);
@@ -162,19 +162,19 @@ exports.getAuthenticatedUser = (req, res) => {
   let userData = {};
   db.doc(`/users/${req.user.handle}`)
     .get()
-    .then((doc) => {
-      if (doc.exists) {
-        userData.credentials = doc.data();
+    .then((user) => {
+      if (user.exists) {
+        userData.credentials = user.data();
         return db
           .collection("likes")
           .where("userHandle", "==", req.user.handle)
           .get();
       }
     })
-    .then((data) => {
+    .then((likes) => {
       userData.likes = [];
-      data.forEach((doc) => {
-        userData.likes.push(doc.data());
+      likes.forEach((like) => {
+        userData.likes.push(like.data());
       });
       return db
         .collection("notifications")
@@ -183,17 +183,17 @@ exports.getAuthenticatedUser = (req, res) => {
         .limit(10)
         .get();
     })
-    .then((data) => {
+    .then((notifications) => {
       userData.notifications = [];
-      data.forEach((doc) => {
+      notifications.forEach((notif) => {
         userData.notifications.push({
-          recipient: doc.data().recipient,
-          sender: doc.data().sender,
-          createdAt: doc.data().createdAt,
-          screamId: doc.data().screamId,
-          type: doc.data().type,
-          read: doc.data().read,
-          notificationId: doc.id,
+          recipient: notif.data().recipient,
+          sender: notif.data().sender,
+          createdAt: notif.data().createdAt,
+          screamId: notif.data().screamId,
+          type: notif.data().type,
+          read: notif.data().read,
+          notificationId: notif.id,
         });
       });
       return res.json(userData);
@@ -209,7 +209,7 @@ exports.uploadImage = (req, res) => {
   const path = require("path");
   const os = require("os");
   const fs = require("fs");
-  const { v4: uuidv4 } = require('uuid');
+  const { v4: uuidv4 } = require("uuid");
 
   const busboy = new BusBoy({ headers: req.headers });
 
