@@ -104,7 +104,9 @@ exports.login = (req, res) => {
 
 // Add user details
 exports.addUserDetails = (req, res) => {
-  let userDetails = reduceUserDetails(req.body);
+  const userDetails = reduceUserDetails(req.body);
+  if (Object.keys(userDetails).length == 0)
+    return res.json({ message: "No details to update" });
 
   db.doc(`/users/${req.user.handle}`)
     .update(userDetails)
@@ -207,6 +209,7 @@ exports.uploadImage = (req, res) => {
   const path = require("path");
   const os = require("os");
   const fs = require("fs");
+  const { v4: uuidv4 } = require('uuid');
 
   const busboy = new BusBoy({ headers: req.headers });
 
@@ -218,9 +221,7 @@ exports.uploadImage = (req, res) => {
       return res.status(400).json({ error: "Wrong file type submitted" });
     }
     const imageExtension = filename.split(".").pop();
-    imageFileName = `${Math.round(
-      Math.random() * 100000000000
-    )}.${imageExtension}`;
+    imageFileName = `${uuidv4()}.${imageExtension}`;
     const filepath = path.join(os.tmpdir(), imageFileName);
     imageToBeUploaded = { filepath, mimetype };
     file.pipe(fs.createWriteStream(filepath));

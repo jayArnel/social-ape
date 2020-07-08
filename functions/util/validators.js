@@ -42,15 +42,18 @@ exports.validateLoginData = (data) => {
 exports.reduceUserDetails = (data) => {
   let userDetails = {};
 
-  if (!isEmpty(data.bio.trim())) userDetails.bio = data.bio;
-
-  const website = data.website.trim();
-  if (!isEmpty(website)) {
-    if (!website.startsWith("http")) {
-      userDetails.website = `http://${website}`;
-    } else userDetails.website = data.website;
+  if (data.hasOwnProperty("bio")) userDetails.bio = data.bio;
+  if (data.hasOwnProperty("website")) {
+    const website = data.website;
+    const website_trim = website.trim();
+    if (!isEmpty(website_trim)) {
+      if (!website_trim.startsWith("http")) {
+        website = `http://${website_trim}`;
+      } else website = website_trim;
+    }
+    userDetails.website = website;
   }
-  if (!isEmpty(data.location.trim())) userDetails.location = data.location;
+  if (data.hasOwnProperty("location")) userDetails.location = data.location;
 
   return userDetails;
 };
