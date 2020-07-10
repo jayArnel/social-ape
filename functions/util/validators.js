@@ -44,7 +44,7 @@ exports.reduceUserDetails = (data) => {
 
   if (data.hasOwnProperty("bio")) userDetails.bio = data.bio;
   if (data.hasOwnProperty("website")) {
-    const website = data.website;
+    let website = data.website;
     const website_trim = website.trim();
     if (!isEmpty(website_trim)) {
       if (!website_trim.startsWith("http")) {
