@@ -124,8 +124,21 @@ exports.onUserImageChange = functions
               userImage: change.after.data().imageUrl,
             });
           });
+          return db
+            .collection("comments")
+            .where("userHandle", "==", change.before.data().handle)
+            .get();
+        })
+        .then((comments) => {
+          comments.forEach((comment) => {
+            const commentData = db.doc(`/comments/${comment.id}`);
+            batch.update(commentData, {
+              userImage: change.after.data().imageUrl,
+            });
+          });
           return batch.commit();
-        });
+        })
+        .catch((err) => console.error(err));
     } else return true;
   });
 
