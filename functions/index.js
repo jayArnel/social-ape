@@ -1,5 +1,6 @@
 const functions = require("firebase-functions");
 const app = require("express")();
+const cors = require("cors");
 const FBAuth = require("./util/fbAuth");
 const { db } = require("./util/admin");
 const {
@@ -21,6 +22,9 @@ const {
   getUserDetails,
   markNotificationsRead,
 } = require("./handlers/users");
+
+// Middleware
+app.use(cors());
 
 // Scream routes
 app.get("/screams", getAllScreams);
