@@ -24,7 +24,7 @@ const {
 } = require("./handlers/users");
 
 // Middleware
-app.use(cors());
+app.use(cors({ origin: true }));
 
 // Scream routes
 app.get("/screams", getAllScreams);
