@@ -9,14 +9,15 @@ pipeline {
 
     stage('Install') {
       steps {
-        bat 'cd functions'
-        bat 'npm install'
+        dir(path: 'functions') {
+          bat 'npm install'
+        }
+
       }
     }
 
     stage('Test') {
       steps {
-        bat 'cd functions'
         bat 'npm test'
       }
     }
