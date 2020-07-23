@@ -9,7 +9,6 @@ describe("Test signup validator", () => {
       handle: "user",
     };
     const validation = validators.validateSignupData(validUserData);
-    console.log(validation);
     expect(validation).toEqual({ errors: {}, valid: true });
   });
 
@@ -34,7 +33,6 @@ describe("Test signup validator", () => {
       handle: "user",
     };
     const validation = validators.validateSignupData(validUserData);
-    console.log(validation);
     expect(validation).toEqual({
       errors: { email: "Must be a valid email address." },
       valid: false,
@@ -50,7 +48,10 @@ describe("Test signup validator", () => {
     };
     const validation = validators.validateSignupData(validUserData);
     expect(validation).toEqual({
-      errors: { password: "Must not be empty." },
+      errors: {
+        password: "Must not be empty.",
+        confirmPassword: "Passwords must match",
+      },
       valid: false,
     });
   });
