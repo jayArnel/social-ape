@@ -7,18 +7,34 @@ pipeline {
       }
     }
 
-    stage('Test') {
+    stage('Install') {
       steps {
         bat 'cd functions'
         bat 'npm install'
+      }
+    }
+
+    stage('Test') {
+      steps {
+        bat 'cd functions'
         bat 'npm test'
       }
     }
 
     stage('Publish') {
-      steps {
-        cobertura(coberturaReportFile: '**/reports/coverage/cobertura-coverage.xml')
-        junit '**/reports/junit.xml'
+      parallel {
+        stage('Coverage') {
+          steps {
+            cobertura(coberturaReportFile: '**/reports/coverage/cobertura-coverage.xml')
+          }
+        }
+
+        stage('Test results') {
+          steps {
+            junit '**/reports/junit.xml'
+          }
+        }
+
       }
     }
 
