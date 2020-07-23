@@ -1,12 +1,6 @@
 pipeline {
   agent any
   stages {
-    stage('Checkout') {
-      steps {
-        git(credentialsId: 'c6aa486a-6522-4fc0-a3d2-7402fd7893c6', branch: 'unit-test', url: 'https://github.com/jayArnel/social-ape')
-      }
-    }
-
     stage('Install') {
       steps {
         dir(path: 'functions') {
@@ -18,7 +12,10 @@ pipeline {
 
     stage('Test') {
       steps {
-        bat 'npm test'
+        dir(path: 'functions') {
+          bat 'npm test'
+        }
+
       }
     }
 
