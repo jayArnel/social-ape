@@ -23,7 +23,7 @@ pipeline {
       parallel {
         stage('Coverage') {
           steps {
-            cobertura(coberturaReportFile: '**/reports/coverage/cobertura-coverage.xml')
+            cobertura(coberturaReportFile: '**/reports/coverage/cobertura-coverage.xml', sourceEncoding: 'ASCII', zoomCoverageChart: true)
           }
         }
 
