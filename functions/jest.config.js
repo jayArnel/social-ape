@@ -98,6 +98,9 @@ module.exports = {
       "jest-junit",
       {
         outputDirectory: "reports",
+        includeShortConsoleOutput: true,
+        classNameTemplate: "{title}",
+        titleTemplate: "{classname}",
       },
     ],
   ],
