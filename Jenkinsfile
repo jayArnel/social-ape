@@ -4,7 +4,10 @@ pipeline {
     stage('Install') {
       steps {
         dir(path: 'functions') {
-          bat 'npm install'
+          nodejs('node14') {
+            sh 'npm install'
+          }
+
         }
 
       }
@@ -12,8 +15,9 @@ pipeline {
 
     stage('Test') {
       steps {
-        dir(path: 'functions') {
-          bat 'npm test'
+        dir(path: 'functions')
+        nodejs('node14') {
+          sh 'npm test'
         }
 
       }
