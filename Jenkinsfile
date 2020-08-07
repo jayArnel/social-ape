@@ -15,9 +15,11 @@ pipeline {
 
     stage('Test') {
       steps {
-        dir(path: 'functions')
-        nodejs('node14') {
-          sh 'npm test'
+        dir(path: 'functions') {
+          nodejs('node14') {
+            sh 'npm test'
+          }
+
         }
 
       }
